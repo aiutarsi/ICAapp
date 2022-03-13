@@ -5,6 +5,7 @@ import numpy.linalg as LA
 import random
 import datetime
 from scipy.io.wavfile import read, write
+from PIL import Image, ImageOps
 
 
 # make new data whose average is zero
@@ -17,7 +18,6 @@ def make_new_data(data,ave_data):
 # repetition algorithm
 def repetition(w,z):
   w_before = w
-  #np.multiply(w, 1/LA.norm(w))
   w = w*(1/LA.norm(w))
   max_loop_size = 100
   while (max_loop_size > 0):
@@ -51,14 +51,42 @@ def read_file_wav(filenames):
     data.append(tmp_data)
   return data, rates
 
+# read data from file(png gray)
+def read_file_png_gray(filenames):
+  images = []
+  for f in filenames:
+    images.append(np.array(Image.open(f).convert('L')))
+  data = []
+  for i in range(len(filenames)):
+    data.append(images[i].copy())
+  for i in range(len(filenames)):
+    data[i] = np.ravel(data[i])
+  return data, images
+
 # write data(wav)
 def write_file_wav(y, RATE, N):
   date_now = datetime.datetime.now().isoformat()
   s = []
   for i in range(N):
-    s.append('separate'+date_now+'_'+str(i+1)+'.wav')
+    s.append('separate_'+date_now+'_'+str(i+1)+'.wav')
   for i in range(N):
     write(s[i], RATE, y[i])
+
+# write data(png gray)
+def write_file_png_gray(images_new, N):
+  images = []
+  for i in range(N):
+    images.append(Image.fromarray(images_new[i].astype(np.uint8)))
+  date_now = datetime.datetime.now().isoformat()
+  s = []
+  for i in range(N):
+    s.append('separate_'+date_now+'_'+str(i+1)+'.png')
+  for i in range(N):
+    images[i].save(s[i])
+  # convert black & white
+  for i in range(N):
+    image_inv = ImageOps.invert(images[i])
+    image_inv.save('separate_'+date_now+'_'+str(i+1)+'_inv.png')
 
 
 class Application(tk.Frame):
@@ -72,14 +100,19 @@ class Application(tk.Frame):
     self.file_names_arr = [] # file names to sep
 
     #file open btn
-    fileopen_btn = tk.Button(self, text='Select *.wav file', bg="#ffffff", activebackground="#a9a9a9", relief='raised')
+    fileopen_btn = tk.Button(self, text='Select file', bg="#ffffff", activebackground="#a9a9a9", relief='raised')
     fileopen_btn.bind('<ButtonPress>', self.file_dialog)
-    fileopen_btn.place(x=20, y=20, width=200, height=20)
+    fileopen_btn.place(x=20, y=20, width=150, height=20)
 
-    #run ICA btn
-    self.exe_btn = tk.Button(self, text='Run', bg="#ffffff", activebackground="#a9a9a9", relief='raised', state=tk.DISABLED)
-    self.exe_btn.bind('<ButtonPress>', self.ica_wav)
-    self.exe_btn.place(x=240, y=20, width=200, height=20)
+    #run ICA btn (wav)
+    self.exe_btn_wav = tk.Button(self, text='Run (wav)', bg="#ffffff", activebackground="#a9a9a9", relief='raised', state=tk.DISABLED)
+    self.exe_btn_wav.bind('<ButtonPress>', self.ica_wav)
+    self.exe_btn_wav.place(x=190, y=20, width=150, height=20)
+
+    #run ICA btn (png gray)
+    self.exe_btn_png_g = tk.Button(self, text='Run (png gray)', bg="#ffffff", activebackground="#a9a9a9", relief='raised', state=tk.DISABLED)
+    self.exe_btn_png_g.bind('<ButtonPress>', self.ica_png_gray)
+    self.exe_btn_png_g.place(x=360, y=20, width=150, height=20)
 
     # message
     self.message = 'File unselected'
@@ -145,13 +178,16 @@ class Application(tk.Frame):
   def change_message_label(self):
     if (len(self.file_names_arr)==0):
       self.message = 'File unselected'
-      self.exe_btn["state"] = tk.DISABLED
+      self.exe_btn_wav["state"] = tk.DISABLED
+      self.exe_btn_png_g["state"] = tk.DISABLED
     else:
       self.message = 'If you want to delete file, please click the number button on the left side of file name'
       if (len(self.file_names_arr)==1):
-        self.exe_btn["state"] = tk.DISABLED
+        self.exe_btn_wav["state"] = tk.DISABLED
+        self.exe_btn_png_g["state"] = tk.DISABLED
       else:
-        self.exe_btn["state"] = tk.NORMAL
+        self.exe_btn_wav["state"] = tk.NORMAL
+        self.exe_btn_png_g["state"] = tk.NORMAL
     self.message_label['text'] = self.message
 
   # pushed select file btn
@@ -159,7 +195,7 @@ class Application(tk.Frame):
     self.clear_del_btn()
     self.clear_file_name_labels()
 
-    fileTypes = [("WAV","*.wav")]
+    fileTypes = [("WAV & PNG","*.wav *.png"), ("WAV","*.wav"), ("Gray-Scale PNG","*.png")]
     initialDir = "./"
     self.new_file_names_arr = tk.filedialog.askopenfilenames(title='Select file', filetypes=fileTypes, initialdir=initialDir)
     
@@ -197,7 +233,43 @@ class Application(tk.Frame):
 
     w = []
     for i in range(N):
-      w.append(np.array([random.random() for i in range(N)]))
+      w.append(np.array([random.randint(-50,100) for i in range(N)]))
+    w_after = []
+    for i in range(N):
+      w_after.append(repetition(w[i],z))
+    
+    y = []
+    for i in range(N):
+      y.append(np.dot(w_after[i].T,z))
+
+    write_file_wav(y, RATE, N)
+
+  # ica for png(gray)
+  def ica_png_gray(self, event):
+    N = len(self.file_names_arr)
+    data, images = read_file_png_gray(self.file_names_arr)
+    LEN = len(data[0])
+
+    # the data size was different in each png file
+    for i in range(N-1):
+      if (len(data[i]) != len(data[i+1])):
+        return "error"
+    
+    tmp_x = []
+    for i in range(N):
+      tmp_x += make_new_data(data[i],np.mean(data[i]))
+    x = np.array(tmp_x).reshape(N,LEN)
+
+    covar_mat = np.cov(x)
+    eig_value_data, eig_vector_data = LA.eig(covar_mat)
+    D = np.diag(eig_value_data)
+    E = eig_vector_data
+    V = np.dot(np.dot(E, LA.matrix_power(np.sqrt(D),-1)), E.T)
+    z = np.dot(V,x)
+
+    w = []
+    for i in range(N):
+      w.append(np.array([random.randint(-50,100) for i in range(N)]))
     w_after = []
     for i in range(N):
       w_after.append(repetition(w[i],z))
@@ -206,7 +278,20 @@ class Application(tk.Frame):
     for i in range(N):
       y.append(np.dot(w_after[i].T,z))
     
-    write_file_wav(y, RATE, N)
+    # convert to 0~255 for png format
+    for i in range(N):
+      y_max = np.amax(y[i])
+      y_min_abs = abs(np.amin(y[i]))
+      y[i] += y_min_abs
+      y[i] /= y_max + y_min_abs
+      y[i] *= 255
+    
+    # 1d array to 2d array
+    images_new = []
+    for i in range(N):
+      images_new.append(y[i].reshape(images[i].shape[0],images[i].shape[1]))
+    
+    write_file_png_gray(images_new, N)
 
 if __name__ == "__main__":
   root = tk.Tk()
