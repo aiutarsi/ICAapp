@@ -17,6 +17,7 @@ def make_new_data(data,ave_data):
 # repetition algorithm
 def repetition(w,z):
   w_before = w
+  #np.multiply(w, 1/LA.norm(w))
   w = w*(1/LA.norm(w))
   max_loop_size = 100
   while (max_loop_size > 0):
@@ -55,48 +56,9 @@ def write_file_wav(y, RATE, N):
   date_now = datetime.datetime.now().isoformat()
   s = []
   for i in range(N):
-    s.append('separate'+date_now+'_'+str(N+1)+'.wav')
+    s.append('separate'+date_now+'_'+str(i+1)+'.wav')
   for i in range(N):
     write(s[i], RATE, y[i])
-
-# ica for wav
-def ica_wav(filenames):
-  N = len(filenames)
-  data, rates = read_file_wav(filenames)
-  LEN = len(data[0])
-  RATE = rates[0]
-
-  # the data size was different in each wav file(or rate different)
-  for i in range(N-1):
-    if (len(data[i]) != len(data[i+1])):
-      return "error"
-    if (rates[i] != rates[i+1]):
-      return "error"
-  
-  tmp_x = []
-  for i in range(N):
-    tmp_x += make_new_data(data[i],np.mean(data[i]))
-  x = np.array(tmp_x).reshape(N,LEN)
-
-  covar_mat = np.cov(x)
-  eig_value_data, eig_vector_data = LA.eig(covar_mat)
-  D = np.diag(eig_value_data)
-  E = eig_vector_data
-  V = np.dot(np.dot(E, LA.matrix_power(np.sqrt(D),-1)), E.T)
-  z = np.dot(V,x)
-
-  w = []
-  for i in range(N):
-    w.append([random.random() for i in range(N)])
-  w_after = []
-  for i in range(N):
-    w_after.append(repetition(w[i],z))
-  
-  y = []
-  for i in range(N):
-    y.append(np.dot(w_after[i].T,z))
-  
-  write_file_wav(y, RATE, N)
 
 
 class Application(tk.Frame):
@@ -116,7 +78,7 @@ class Application(tk.Frame):
 
     #run ICA btn
     self.exe_btn = tk.Button(self, text='Run', bg="#ffffff", activebackground="#a9a9a9", relief='raised', state=tk.DISABLED)
-    #self.exe_btn.bind('<ButtonPress>', ica_wav(self.file_names_arr))
+    self.exe_btn.bind('<ButtonPress>', self.ica_wav)
     self.exe_btn.place(x=240, y=20, width=200, height=20)
 
     # message
@@ -134,7 +96,7 @@ class Application(tk.Frame):
   def make_file_name_labels(self):
     for i in range(len(self.file_names_arr)):
       self.file_name_labels.append(tk.Label(text=self.file_names_arr[i], anchor='w'))
-      self.file_name_labels[i].place(x=40, y=60+20*i, width=700, height=20)
+      self.file_name_labels[i].place(x=50, y=60+20*i, width=700, height=20)
   
   # clear all file name labels
   def clear_file_name_labels(self):
@@ -207,7 +169,44 @@ class Application(tk.Frame):
     self.make_del_btn()
     self.make_file_name_labels()
   
-  #def exe_ica(self, event):
+  # ica for wav
+  def ica_wav(self, event):
+    N = len(self.file_names_arr)
+    data, rates = read_file_wav(self.file_names_arr)
+    LEN = len(data[0])
+    RATE = rates[0]
+
+    # the data size was different in each wav file(or rate different)
+    for i in range(N-1):
+      if (len(data[i]) != len(data[i+1])):
+        return "error"
+      if (rates[i] != rates[i+1]):
+        return "error"
+    
+    tmp_x = []
+    for i in range(N):
+      tmp_x += make_new_data(data[i],np.mean(data[i]))
+    x = np.array(tmp_x).reshape(N,LEN)
+
+    covar_mat = np.cov(x)
+    eig_value_data, eig_vector_data = LA.eig(covar_mat)
+    D = np.diag(eig_value_data)
+    E = eig_vector_data
+    V = np.dot(np.dot(E, LA.matrix_power(np.sqrt(D),-1)), E.T)
+    z = np.dot(V,x)
+
+    w = []
+    for i in range(N):
+      w.append(np.array([random.random() for i in range(N)]))
+    w_after = []
+    for i in range(N):
+      w_after.append(repetition(w[i],z))
+    
+    y = []
+    for i in range(N):
+      y.append(np.dot(w_after[i].T,z))
+    
+    write_file_wav(y, RATE, N)
 
 if __name__ == "__main__":
   root = tk.Tk()
