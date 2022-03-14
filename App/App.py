@@ -7,9 +7,6 @@ import datetime
 from scipy.io.wavfile import read, write
 from PIL import Image, ImageOps
 import os
-import threading
-import copy
-import time
 
 # make new data whose average is zero
 def make_new_data(data,ave_data):
@@ -55,7 +52,6 @@ def read_file_wav(filenames, process_message_text):
       data.append(tmp_data)
     except:
       process_message_text.set('Process suspended by something error.\nCaution : please select only one type file (ex : only png gray)')
-      #process_state[0] = 3
       return
   return data, rates
 
@@ -67,8 +63,6 @@ def read_file_png_gray(filenames, process_message_text):
       images.append(np.array(Image.open(f).convert('L')))
     except:
       process_message_text.set('Process suspended by something error.\nCaution : please select only one type file (ex : only png gray)')
-      #process_message["text"] = 'Process suspended by something error.\nCaution : please select only one type file (ex : only png gray)'
-      #process_state[0] = 3
       return
   data = []
   for i in range(len(filenames)):
@@ -145,57 +139,17 @@ class Application(tk.Frame):
     self.read_dir = './'
     self.write_dir = './'
 
+    # canvas
+    """
+    self.canvas = tk.Canvas(self, width=700, height=460, bg='#D0A8F4', relief=tk.GROOVE)
+    self.canvas.place(x=50, y=60)
+    """
+
     # state while processing mesage
     self.process_message_text = tk.StringVar()
     self.process_message_text.set('After files which you want to separate are selected, please push Run Button.\nCaution : please select only one type file (ex : only png gray)')
-    self.process_state = [0]
     self.process_message = tk.Label(textvariable=self.process_message_text)
     self.process_message.place(x=40, y=540, width=700, height=40)
-    """
-    self.thread = threading.Thread(target=self.process_massage_run())
-    self.thread.start()
-    """
-
-  
-  def process_massage_run(self): # process_state is mutable object(list) for changing while while loop
-    counter = [6, 0]
-    while (1):
-      process_state_in = copy.deepcopy(self.process_state[0])
-      print(process_state_in)
-      if (counter[1] != process_state_in):
-        counter[0] = 6
-        counter[1] = process_state_in
-
-      # message change
-      if (process_state_in == 0): # don't processing
-        self.process_message["text"] = 'After files which you want to separate are selected, please push Run Button.\nCaution : please select only one type file (ex : only png gray)'
-      elif (process_state_in == 1): # processing
-        self.process_message["text"] = 'Processing now ...'
-      elif (process_state_in == 2): # processing finish successfully
-        self.process_message["text"] = 'Process ended successfully!'
-      elif (process_state_in == 3): # processing finish by error
-        self.process_message["text"] = 'Process suspended by something error.\nCaution : please select only one type file (ex : only png gray)'
-      
-      # sleep time
-      if (process_state_in == 0):
-        time.sleep(0.5)
-      elif (process_state_in == 1):
-        self.process_message["text"] = ''
-        time.sleep(0.1)
-        self.process_message["text"] = 'Processing now ...'
-        time.sleep(0.4)
-      elif (process_state_in == 2):
-        if (counter[1] <= 0):
-          self.process_state[0] = 0
-        counter[1] -= 1
-        time.sleep(0.5)
-      elif (process_state_in == 3):
-        if (counter[1] <= 0):
-          self.process_state[0] = 0
-        counter[1] -= 1
-        time.sleep(0.5)
-      else:
-        time.sleep(0.5)
 
   # make file name labels
   def make_file_name_labels(self):
@@ -225,7 +179,6 @@ class Application(tk.Frame):
   # pushed del_btn
   def del_label(self, event):
     self.process_message_text.set('After files which you want to separate are selected, please push Run Button.\nCaution : please select only one type file (ex : only png gray)')
-    #self.process_message["text"] = 'After files which you want to separate are selected, please push Run Button.\nCaution : please select only one type file (ex : only png gray)'
     index = int(event.widget["text"])-1
 
     self.clear_del_btn()
@@ -266,7 +219,6 @@ class Application(tk.Frame):
 
   # pushed select file btn
   def file_dialog(self, event):
-    #self.process_message["text"] = 'After files which you want to separate are selected, please push Run Button.\nCaution : please select only one type file (ex : only png gray)'
     self.process_message_text.set('After files which you want to separate are selected, please push Run Button.\nCaution : please select only one type file (ex : only png gray)')
     self.clear_del_btn()
     self.clear_file_name_labels()
@@ -290,14 +242,12 @@ class Application(tk.Frame):
   def ica_wav(self, event):
     self.save_dir_dialog()
 
-    #self.process_state[0] = 1
-    self.process_message_text.set('Processing now ...')
-    #self.process_message["text"] = 'Processing now ...'
+    self.process_message_text.set('Processing now ...') #don't reflect this place
 
     N = len(self.file_names_arr)
     
     data, rates = read_file_wav(self.file_names_arr, self.process_message_text)
-    if (self.process_state[0] == 3): # reading file error & break this func
+    if (self.process_message_text == 'Process suspended by something error.\nCaution : please select only one type file (ex : only png gray)'):
       return
     LEN = len(data[0])
     RATE = rates[0]
@@ -333,21 +283,17 @@ class Application(tk.Frame):
       y.append(np.dot(w_after[i].T,z))
 
     write_file_wav(y, RATE, N, self.write_dir)
-    #self.process_state[0] = 2
     self.process_message_text.set('Process ended successfully!')
-    #self.process_message["text"] = 'Process ended successfully!'
 
   # ica for png(gray)
   def ica_png_gray(self, event):
     self.save_dir_dialog()
 
-    #self.process_state[0] = 1
-    self.process_message_text.set('Processing now ...')
-    #self.process_message["text"] = 'Processing now ...'
+    self.process_message_text.set('Processing now ...') #don't reflect this place
 
     N = len(self.file_names_arr)
     data, images = read_file_png_gray(self.file_names_arr, self.process_message_text)
-    if (self.process_state[0] == 3): # reading file error & break this func
+    if (self.process_message_text == 'Process suspended by something error.\nCaution : please select only one type file (ex : only png gray)'):
       return
     LEN = len(data[0])
 
@@ -393,9 +339,7 @@ class Application(tk.Frame):
       images_new.append(y[i].reshape(images[i].shape[0],images[i].shape[1]))
     
     write_file_png_gray(images_new, N, self.write_dir)
-    #self.process_state[0] = 2
     self.process_message_text.set('Process ended successfully!')
-    #self.process_message["text"] = 'Process ended successfully!'
 
 if __name__ == "__main__":
   root = tk.Tk()
