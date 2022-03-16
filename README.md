@@ -123,6 +123,8 @@ Sorry, I did operation confirmation only on MacOS & Windows I want to do it on W
 
 ![Menu-mac](/img/Menu-mac.png)
 
+![Menu-win](/img/Menu-win.png)
+
 - Select files
 - Push appropriate button which run ICA
 
