@@ -1,6 +1,6 @@
 # ICAapp
 
-![ico](App/ica.ico)
+![ico](App-mac/ica.ico)
 
 ## Overview
 
