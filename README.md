@@ -18,7 +18,9 @@ ICA is included in scipy, but I don't use it in this app.
 
 #### Desktop Application(Binaries)
 
-Download from latest Releases or Tags. Maybe that's all!
+Removed mac version because app file(Binaries) which is downloaded from GitHub doesn't start up on my environment(this binaries can work after made by pyinstaller, but once upload it on GitHub, then download it, doesn't work).
+
+**Sorry, please try below method.**
 
 #### Desktop Application(Binaries) by yourself
 
@@ -34,6 +36,8 @@ The binaries is made in ~dist/ICAapp, and open it. It need about 20 seconds to s
 If app doesn't move, please remove `--onefile` option.
 
 ##### Requirements
+
+I developed it in `venv`(python's one of the standard libraries, virtual environment).
 
 Python 3.7.3 and below packages.
 
