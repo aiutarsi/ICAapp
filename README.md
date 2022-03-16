@@ -22,7 +22,7 @@ Download from latest Releases or Tags. Maybe that's all!
 
 #### Desktop Application(Binaries) by yourself
 
-Download main branch's files and directories, and move to `App` directory.
+Download main branch's files and directories, and move to `App-mac` directory.
 Do below command.
 
 ```
@@ -56,7 +56,7 @@ zipp                      3.7.0
 
 #### Desktop Application(By console)
 
-Download main branch's files and directories, and move to `App` directory.
+Download main branch's files and directories, and move to `App-mac` directory.
 Do below command.
 
 ```
@@ -65,10 +65,59 @@ $ python3 App.py
 
 You need python's environment on you PC in this method.
 
+### Windows
 
-### Windows & Linux
+#### Desktop Application(Binaries)
 
-Sorry, I did operation confirmation only on MacOS. I want to do it on Win and Linux for the future.
+Download from latest Releases or Tags. Maybe that's all!
+
+#### Desktop Application(Binaries) by yourself
+
+Download main branch's files and directories, and move to `App-win` directory.
+Do below command.
+
+```
+> pyinstaller App.py --onefile --clean --noconsole --icon=ica.ico --name ICAapp
+```
+
+The binaries is made in ~dist/ICAapp, and open it. It need about 20 seconds to start up.
+
+If app doesn't move, please remove `--onefile` option.
+
+##### Requirements
+
+Python 3.10.2 and below packages.
+
+```
+Package                   Version
+------------------------- --------
+altgraph                  0.17.2
+future                    0.18.2
+numpy                     1.22.3
+pefile                    2021.9.3
+Pillow                    9.0.1
+pip                       22.0.4
+pyinstaller               4.10
+pyinstaller-hooks-contrib 2022.2
+pywin32-ctypes            0.2.0
+scipy                     1.8.0
+setuptools                58.1.0
+```
+
+#### Desktop Application(By console)
+
+Download main branch's files and directories, and move to `App-win` directory.
+Do below command.
+
+```
+> python3 App.py
+```
+
+You need python's environment on you PC in this method.
+
+### Linux
+
+Sorry, I did operation confirmation only on MacOS & Windows I want to do it on Win and Linux for the future.
 
 ## Usage
 

@@ -1,5 +1,3 @@
-from itertools import filterfalse
-from stringprep import in_table_c21_c22
 import tkinter as tk
 import tkinter.filedialog
 import numpy as np
@@ -136,9 +134,11 @@ def read_file_png_color(filenames, process_message_text):
 # write data(wav)
 def write_file_wav(y, RATE, N, write_dir):
   date_now = datetime.datetime.now().isoformat()
+  date_now = date_now.replace(':', '-')
   s = []
   for i in range(N):
     s.append(write_dir+os.sep+'separate_'+date_now+'_'+str(i+1)+'.wav')
+    #s.append('separate_'+date_now+'_'+str(i+1)+'.wav')
   for i in range(N):
     write(s[i], RATE, y[i])
 
@@ -148,19 +148,23 @@ def write_file_png_gray(images_new, N, write_dir):
   for i in range(N):
     images.append(Image.fromarray(images_new[i].astype(np.uint8)))
   date_now = datetime.datetime.now().isoformat()
+  date_now = date_now.replace(':', '-')
   s = []
   for i in range(N):
     s.append(write_dir+os.sep+'separate_'+date_now+'_'+str(i+1)+'.png')
+    #s.append('separate_'+date_now+'_'+str(i+1)+'.png')
   for i in range(N):
     images[i].save(s[i])
   # convert black & white
   for i in range(N):
     image_inv = ImageOps.invert(images[i])
     image_inv.save(write_dir+os.sep+'separate_'+date_now+'_'+str(i+1)+'_inv.png')
+    #image_inv.save('separate_'+date_now+'_'+str(i+1)+'_inv.png')
 
 # write data(png color)
 def write_file_png_color(images_each_color_sep_tmp, images_each_color_sep, N, write_dir, height, width):
   date_now = datetime.datetime.now().isoformat()
+  date_now = date_now.replace(':', '-')
   for i in range(N):
     images_each_color_sep[i][0].save(write_dir+os.sep+'separate_'+date_now+'_'+str(i+1)+'_red.png')
     images_each_color_sep[i][1].save(write_dir+os.sep+'separate_'+date_now+'_'+str(i+1)+'_green.png')
@@ -198,6 +202,7 @@ def write_file_png_color(images_each_color_sep_tmp, images_each_color_sep, N, wr
     images_sep.append(Image.fromarray(images_sep_tmp[i].astype(np.uint8)))
   for i in range(N):
     images_sep[i].save(write_dir+os.sep+'separate_'+date_now+'_'+str(i+1)+'.png')
+    #images_sep[i].save('separate_'+date_now+'_'+str(i+1)+'.png')
 
 
 class Application(tk.Frame):
@@ -247,8 +252,8 @@ class Application(tk.Frame):
     self.file_name_labels = []
 
     # read data & save data directory
-    self.read_dir = './'
-    self.write_dir = './'
+    self.read_dir = os.getcwd()
+    self.write_dir = os.getcwd()
 
     # state while processing mesage
     self.process_message_text = tk.StringVar()
@@ -351,6 +356,8 @@ class Application(tk.Frame):
   # pushed run btn (select save directory of written file)
   def save_dir_dialog(self):
     self.write_dir = tk.filedialog.askdirectory(initialdir=self.write_dir)
+    self.write_dir = self.write_dir.replace('/', os.sep)
+    #print(self.write_dir)
   
   # ica for wav
   def ica_wav(self, event):
@@ -612,7 +619,9 @@ class Application(tk.Frame):
     
     image_new = Image.fromarray(image_new_arr.astype(np.uint8))
     date_now = datetime.datetime.now().isoformat()
+    date_now = date_now.replace(':', '-')
     image_new.save(self.write_dir+os.sep+'synthesize_'+date_now+'.png')
+    #image_new.save('synthesize_'+date_now+'.png')
     self.process_message_text.set('Process ended successfully!')
 
 
