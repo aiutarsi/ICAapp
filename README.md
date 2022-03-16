@@ -10,6 +10,8 @@ ICA is one of the statistical methods that separates mixed multiple sounds or im
 
 ICA is included in scipy, but I don't use it in this app.
 
+![ICA-color](img/ICA-color.png)
+
 ## Installation
 
 ### MacOS
