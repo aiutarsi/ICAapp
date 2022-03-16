@@ -1,5 +1,3 @@
-from itertools import filterfalse
-from stringprep import in_table_c21_c22
 import tkinter as tk
 import tkinter.filedialog
 import numpy as np
