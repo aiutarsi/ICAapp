@@ -4,11 +4,11 @@
 
 ## Overview
 
-**This is an GUI Desktop application which execute Independent Component Analysis(ICA) for sound files(wav) or image files(png gray & color) which you selected.**
+**This is a GUI Desktop application that executes Independent Component Analysis(ICA) for sound files(Wav) or image files(png gray & color) that you selected.**
 
-ICA is one of the statistical methods that separates mixed multiple sounds or images. For example, there two wav files which mixed two different speaker's talk at different rations, by using ICA's algorithm, we can separate them to each speaker's talk. It is look like cocktail-parity effect.
+ICA is one of the statistical methods that separates mixed multiple sounds or images. For example, there are 2 Wav files that mixed two different speakers' talks at different rations, by using ICA's algorithm, we can separate them to each speaker's talk. It looks like a cocktail-parity effect.
 
-ICA is included in scipy, but I don't use it in this app.
+ICA is included in Scipy, but I don't use it in this app.
 
 ![ICA-color](img/ICA-color.png)
 
@@ -18,22 +18,22 @@ ICA is included in scipy, but I don't use it in this app.
 
 #### Desktop Application(Binaries)
 
-Removed mac version because app file(Binaries) which is downloaded from GitHub doesn't start up on my environment(this binaries can work after made by pyinstaller, but once upload it on GitHub, then download it, doesn't work).
+Removed the Mac version because the app file(Binaries) which is downloaded from GitHub doesn't start up in my environment(these binaries can work just after being made by Pyinstaller, but once upload on GitHub, then download it, doesn't work).
 
-**Sorry, please try below method.**
+**Sorry, please try the below method.**
 
 #### Desktop Application(Binaries) by yourself
 
-Download main branch's files and directories, and move to `App-mac` directory.
-Do below command.
+Download the main branch's files and directories, and move to the `App-mac` directory.
+Do the below command.
 
 ```
 $ pyinstaller App.py --onefile --clean --noconsole --icon=ica.ico --name ICAapp
 ```
 
-The binaries is made in ~dist/ICAapp, and open it. It need about 20 seconds to start up.
+The binaries are made in `~dist/ICAapp`, and open. It needs about 20 seconds to start up.
 
-If app doesn't move, please remove `--onefile` option.
+If the app doesn't move, please remove `--onefile` option.
 
 ##### Requirements
 
@@ -60,33 +60,33 @@ zipp                      3.7.0
 
 #### Desktop Application(By console)
 
-Download main branch's files and directories, and move to `App-mac` directory.
-Do below command.
+Download the main branch's files and directories, and move to the `App-mac` directory.
+Do the below command.
 
 ```
 $ python3 App.py
 ```
 
-You need python's environment on you PC in this method.
+You need python's environment on your PC in this method.
 
 ### Windows
 
 #### Desktop Application(Binaries)
 
-Download from latest Releases or Tags. Maybe that's all!
+Download from the latest Releases or Tags. Maybe that's all!
 
 #### Desktop Application(Binaries) by yourself
 
-Download main branch's files and directories, and move to `App-win` directory.
-Do below command.
+Download the main branch's files and directories, and move to the `App-win` directory.
+Do the below command.
 
 ```
 > pyinstaller App.py --onefile --clean --noconsole --icon=ica.ico --name ICAapp
 ```
 
-The binaries is made in ~dist/ICAapp, and open it. It need about 20 seconds to start up.
+The binaries are made in `~dist/ICAapp`, and open. It needs about 20 seconds to start up.
 
-If app doesn't move, please remove `--onefile` option.
+If the app doesn't move, please remove `--onefile` option.
 
 ##### Requirements
 
@@ -110,18 +110,18 @@ setuptools                58.1.0
 
 #### Desktop Application(By console)
 
-Download main branch's files and directories, and move to `App-win` directory.
-Do below command.
+Download the main branch's files and directories, and move to the `App-win` directory.
+Do the below command.
 
 ```
 > python3 App.py
 ```
 
-You need python's environment on you PC in this method.
+You need python's environment on your PC in this method.
 
 ### Linux
 
-Sorry, I did operation confirmation only on MacOS & Windows I want to do it on Win and Linux for the future.
+Sorry, I did operation confirmation only on macOS & Windows I want to do it on Win and Linux in the future.
 
 ## Usage
 
@@ -130,19 +130,19 @@ Sorry, I did operation confirmation only on MacOS & Windows I want to do it on W
 ![Menu-win](/img/Menu-win.png)
 
 - Select files
-- Push appropriate button which run ICA
+- Push the appropriate button which runs ICA
 
-You can delete selected file by clicking the number button on the left side.
+You can delete the selected file by clicking the number button on the left side.
 
 **Sometimes, separation may fail(only one sound or image is saved), please try several times**
 
-This may be caused by the selecting initial variables.
+This may be caused by selecting initial variables.
 
 ### `Run (wav)` Button
 
-- More than two wav files
-- Only wav files selected
-- same size & sampling rete wav file
+- More than two Wav files
+- Only Wav files selected
+- same size & sampling rete Wav file
 
 ### `Run (png gray)` Button
 
@@ -192,4 +192,4 @@ SOFTWARE.
 
 ## Bugs etc...
 
-Please contact me through Issues or Pull requests. But I don't guarantee to see and reply it.
+Please contact me through Issues or Pull requests. But I don't guarantee to see and reply to it.
